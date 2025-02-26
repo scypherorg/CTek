@@ -1,0 +1,8 @@
+{
+  "itemgroup.ctek.items": "CTek Items",
+  "itemgroup.ctek.blocks": "CTek Blocks",
+  "item.ctek.debug_tool": "Debug Tool",
+  "block.ctek.insulated_copper_cable": "Insulated Copper Cable",
+  "block.ctek.debug_cable": "Debug Cable",
+  "block.ctek.creative_energy_source": "Creative Energy Source"
+}

@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "netvis=0": {
+      "model": "ctek:block/debug_cable_w"
+    },
+    "netvis=1": {
+      "model": "ctek:block/debug_cable_r"
+    },
+    "netvis=2": {
+      "model": "ctek:block/debug_cable_g"
+    },
+    "netvis=3": {
+      "model": "ctek:block/debug_cable_b"
+    },
+    "netvis=4": {
+      "model": "ctek:block/debug_cable_p"
+    }
+  }
+}
