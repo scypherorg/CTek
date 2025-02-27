@@ -22,6 +22,8 @@ public class CTI_DebugTool extends Item {
         if(!(context.getWorld().getBlockState(context.getBlockPos()).getBlock() instanceof PSCBlock))
             return ActionResult.PASS;
         PSCBEntity pscbe = (PSCBEntity)context.getWorld().getBlockEntity(context.getBlockPos());
+        if (pscbe == null)
+            return ActionResult.PASS;
         context.getPlayer().sendMessage(Text.of(""));
         context.getPlayer().sendMessage(Text.of("   " + context.getWorld().getBlockState(context.getBlockPos()).getBlock().getClass().getSimpleName()+"/"+pscbe.getClass().getSimpleName()+"/"+PSManager.getComponent(pscbe.ComponentID).getClass().getSimpleName()));
         context.getPlayer().sendMessage(Text.of(" -Component-ID: " + pscbe.ComponentID));

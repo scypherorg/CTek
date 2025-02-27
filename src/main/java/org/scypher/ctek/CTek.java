@@ -21,11 +21,27 @@ import java.io.IOException;
 
 public class CTek implements ModInitializer {
 	public static final String MOD_ID = "ctek";
-	static String _DATAPATH;
 	// This logger is used to write text to the console and the log file.
 	// It is considered best practice to use your mod id as the logger's name.
 	// That way, it's clear which mod wrote info, warnings, and errors.
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+	static String _DATAPATH;
+
+	public static void SaveData() {
+		com.google.gson.JsonObject data = new JsonObject();
+		data.add("PSManager", PSManager.SaveData());
+		data.add("EnergyNetwork", EnergyNetwork.SaveData());
+		try {
+			FileWriter writer = new FileWriter(_DATAPATH);
+			//Write to File
+			new GsonBuilder()/*.setPrettyPrinting()*/.create().toJson(data, writer);
+			writer.close();
+		} catch (Exception e) {
+			CTek.LOGGER.warn("Unable to save ctek file at {} - {} :: {}", _DATAPATH, e.getStackTrace()[0], e.getMessage());
+			return;
+		}
+		CTek.LOGGER.info("Saved CTek data!");
+	}
 
 	@Override
 	public void onInitialize() {
@@ -35,10 +51,10 @@ public class CTek implements ModInitializer {
 		CTBlocks.Initialize();
 		LOGGER.info("Blocks Initialized...");
 		ServerWorldEvents.LOAD.register((server, world) -> {
-			if(world != server.getWorld(World.OVERWORLD))
+			if (world != server.getWorld(World.OVERWORLD))
 				return;
 			_DATAPATH = server.getSavePath(WorldSavePath.ROOT).toString();
-			if(_DATAPATH.endsWith("."))
+			if (_DATAPATH.endsWith("."))
 				_DATAPATH = _DATAPATH.substring(0, _DATAPATH.length() - 1);
 			_DATAPATH += "ctek.json";
 			try {
@@ -55,25 +71,9 @@ public class CTek implements ModInitializer {
 		ServerTickEvents.END_SERVER_TICK.register(PSManager::OnTick);
 		LOGGER.info("Done initializing CTek.");
 	}
-	void LoadWorld(JsonObject data)
-	{
+
+	void LoadWorld(JsonObject data) {
 		PSManager.LoadData(data.get("PSManager").getAsJsonObject());
 		EnergyNetwork.LoadData(data.get("EnergyNetwork").getAsJsonObject());
-	}
-	public static void SaveData()
-	{
-		com.google.gson.JsonObject data = new JsonObject();
-		data.add("PSManager", PSManager.SaveData());
-		data.add("EnergyNetwork", EnergyNetwork.SaveData());
-		try {
-			FileWriter writer = new FileWriter(_DATAPATH);
-			//Write to File
-			new GsonBuilder()/*.setPrettyPrinting()*/.create().toJson(data, writer);
-			writer.close();
-		} catch (Exception e) {
-			CTek.LOGGER.warn("Unable to save ctek file at {} - {} :: {}", _DATAPATH, e.getStackTrace()[0], e.getMessage());
-			return;
-		}
-		CTek.LOGGER.info("Saved CTek data!");
 	}
 }
