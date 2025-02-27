@@ -3,7 +3,7 @@
 	"package": "com.scypher.ctek.mixin.client",
 	"compatibilityLevel": "JAVA_17",
 	"client": [
-		"ExampleClientMixin"
+		"org.scypher.ctek.mixin.client.ExampleClientMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

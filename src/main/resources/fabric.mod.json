@@ -16,10 +16,10 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"com.scypher.ctek.CTek"
+          "org.scypher.ctek.CTek"
 		],
 		"client": [
-			"com.scypher.ctek.CTekClient"
+          "org.scypher.ctek.CTekClient"
 		]
 	},
 	"mixins": [
