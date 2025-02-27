@@ -58,7 +58,7 @@ public class EnergyNetwork {
     public static void SplitNetwork(EnergyNetwork net, int originConnectorID)
     {
         boolean[] connected = new boolean[net._connectorsCount];
-        Queue<Integer> availabeConnectors = new LinkedList<Integer>();
+        Queue<Integer> availabeConnectors = new LinkedList<>();
         availabeConnectors.offer(net.getConnectorIndex(originConnectorID));
         while (!availabeConnectors.isEmpty()) {
             int cIndex = availabeConnectors.poll();
