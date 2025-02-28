@@ -227,7 +227,7 @@ public class EnergyNetwork {
         System.arraycopy(neighbors, 0, res, 0, count);
         return res;
     }
-    public static EnergyNetwork GetNetwork(int ID)
+    public static EnergyNetwork getNetwork(int ID)
     { return _networks.get(ID); }
     public static void LoadData(JsonObject data)
     {
@@ -371,6 +371,7 @@ public class EnergyNetwork {
         _drainComponents = drains;
         _drainConsumptions = drainConsumptions;
         _drainCount = drains.length;
+        _hasPower = true;
     }
     public EnergyNetwork(int id)
     {
@@ -384,6 +385,7 @@ public class EnergyNetwork {
         _drainComponents = new IEnergyDrain[PSManager.ArrayIncrementStep];
         _drainConsumptions = new int[PSManager.ArrayIncrementStep];
         _drainCount = 0;
+        _hasPower = true;
     }
     //Logic
     void setPower(boolean hasPower)
@@ -575,7 +577,7 @@ public class EnergyNetwork {
         CTek.LOGGER.info("Updating Energy Drain Consumption for Network {}", _id);
         _updateTotalConsumption = false;
         int totalConsumption = 0;
-        for (int i = 0; i < _drainConsumptions.length; i++)
+        for (int i = 0; i < _drainCount; i++)
             totalConsumption += _drainConsumptions[i];
         if(totalConsumption == _totalConsumption)
             return false;
