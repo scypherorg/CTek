@@ -64,7 +64,7 @@ public class PSManager {
             component.ComponentID = getFreeComponentID();
         _components[component.ComponentID] = component;
         if(component instanceof IEnergyConnector iec)
-            EnergyNetwork.CreateConnector(iec, world, pos);
+            EnergyNetwork.createConnector(iec, world, pos);
         if(component instanceof IOnPlaced ion)
             ion.OnPlaced(world, pos);
         CTek.SaveData();
@@ -75,13 +75,13 @@ public class PSManager {
         PSComponent component = _components[cID];
         _components[cID] = null;
         if(component instanceof IEnergyConnector iec)
-            EnergyNetwork.DestroyConnector(iec);
+            EnergyNetwork.destroyConnector(iec);
         CTek.SaveData();
         CTek.LOGGER.info("PSC {} destroyed", cID);
     }
     public static void OnTick(MinecraftServer server)
     {
-        EnergyNetwork.Tick();
+        EnergyNetwork.tick();
     }
     public PSManager(){}
 }

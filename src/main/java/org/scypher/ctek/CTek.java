@@ -30,7 +30,7 @@ public class CTek implements ModInitializer {
 	public static void SaveData() {
 		com.google.gson.JsonObject data = new JsonObject();
 		data.add("PSManager", PSManager.SaveData());
-		data.add("EnergyNetwork", EnergyNetwork.SaveData());
+		data.add("EnergyNetwork", EnergyNetwork.saveData());
 		try {
 			FileWriter writer = new FileWriter(_DATAPATH);
 			//Write to File
@@ -74,6 +74,6 @@ public class CTek implements ModInitializer {
 
 	void LoadWorld(JsonObject data) {
 		PSManager.LoadData(data.get("PSManager").getAsJsonObject());
-		EnergyNetwork.LoadData(data.get("EnergyNetwork").getAsJsonObject());
+		EnergyNetwork.loadData(data.get("EnergyNetwork").getAsJsonObject());
 	}
 }

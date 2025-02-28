@@ -14,7 +14,6 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class EnergyNetwork {
-    //Static Stuff
     static int getNextNetworkID()
     {
         int id = 0;
@@ -23,21 +22,21 @@ public class EnergyNetwork {
         return id;
     }
     static HashMap<Integer, EnergyNetwork> _networks = new HashMap<>();
-    public static EnergyNetwork CreateNetwork() {
+    public static EnergyNetwork createNetwork() {
         EnergyNetwork net = new EnergyNetwork(getNextNetworkID());
         _networks.put(net.getID(), net);
         return net;
     }
-    public static void Tick()
+    public static void tick()
     {
         for (EnergyNetwork net : _networks.values())
-            net.Update();
+            net.update();
     }
-    public static void DestroyConnector(IEnergyConnector connector) {
+    public static void destroyConnector(IEnergyConnector connector) {
         EnergyNetwork net = connector.getEnergyNetwork();
         if(net._connectorsCount == 1 && net._connectorComponents[0].getComponentID() == connector.getComponentID())
         {
-            DestroyNetwork(net);
+            destroyNetwork(net);
             return;
         }
         int cIndex = net.getConnectorIndex(connector.getComponentID());
@@ -45,18 +44,17 @@ public class EnergyNetwork {
             return;
         if(net._connectorConnections[cIndex].length == 1)
         {
-            net.RemoveConnectorConnection(net._connectorConnections[cIndex][0], connector.getComponentID());
-            net.RemoveConnector(cIndex);
+            net.removeConnectorConnection(net._connectorConnections[cIndex][0], connector.getComponentID());
+            net.removeConnector(cIndex);
             return;
         }
-        //Handle Network Splitting
         int[] probePoints = net._connectorConnections[cIndex];
         for (int probePoint : probePoints)
-            net.RemoveConnectorConnection(probePoint, connector.getComponentID());
-        net.RemoveConnector(cIndex);
-        SplitNetwork(net, probePoints[0]);
+            net.removeConnectorConnection(probePoint, connector.getComponentID());
+        net.removeConnector(cIndex);
+        splitNetwork(net, probePoints[0]);
     }
-    public static void SplitNetwork(EnergyNetwork net, int originConnectorID)
+    public static void splitNetwork(EnergyNetwork net, int originConnectorID)
     {
         boolean[] connected = new boolean[net._connectorsCount];
         Queue<Integer> availabeConnectors = new LinkedList<>();
@@ -82,7 +80,7 @@ public class EnergyNetwork {
         }
         if(allConnected)
             return;
-        EnergyNetwork nn = CreateNetwork();
+        EnergyNetwork nn = createNetwork();
         IEnergyConnector[] cccomp = new IEnergyConnector[connectedCount];
         IEnergyConnector[] nccomp = new IEnergyConnector[net._connectorsCount-connectedCount];
         int[][] cccon = new int[connectedCount][];
@@ -102,15 +100,15 @@ public class EnergyNetwork {
             net._connectorComponents[i].setEnergyNetwork(nn);
             if(net._connectorComponents[i] instanceof IEnergySource source)
             {
-                nn.AddSource(source);
+                nn.addSource(source);
                 nn.setProduction(source, net.getProduction(source));
-                net.RemoveSource(source);
+                net.removeSource(source);
             }
             if(net._connectorComponents[i] instanceof IEnergyDrain drain)
             {
-                nn.AddDrain(drain);
+                nn.addDrain(drain);
                 nn.setConsumption(drain, net.getConsumption(drain));
-                net.RemoveDrain(drain);
+                net.removeDrain(drain);
             }
         }
         net._connectorComponents = cccomp;
@@ -121,29 +119,29 @@ public class EnergyNetwork {
         nn._connectorComponents = nccomp;
         nn._connectorConnections = nccon;
         nn._connectorsCount = nccomp.length;
-        SplitNetwork(nn, nn._connectorComponents[0].getComponentID());
+        splitNetwork(nn, nn._connectorComponents[0].getComponentID());
     }
-    static void DestroyNetwork(EnergyNetwork network) {
+    static void destroyNetwork(EnergyNetwork network) {
         _networks.remove(network.getID());
     }
-    public static void CreateConnector(IEnergyConnector connector, World world, BlockPos pos)
+    public static void createConnector(IEnergyConnector connector, World world, BlockPos pos)
     {
-        IEnergyConnector neighbor = GetDifferentNeighborConnector(-1, world, pos);
+        IEnergyConnector neighbor = getDifferentNeighborConnector(-1, world, pos);
         if(neighbor == null)
         {
-            CreateNetwork().AddConnector(connector, world, pos);
+            createNetwork().addConnector(connector, world, pos);
             return;
         }
         EnergyNetwork net = neighbor.getEnergyNetwork();
-        neighbor = GetDifferentNeighborConnector(net.getID(), world, pos);
+        neighbor = getDifferentNeighborConnector(net.getID(), world, pos);
         while (neighbor != null)
         {
-            net = MergeNetworks(net, neighbor.getEnergyNetwork());
-            neighbor = GetDifferentNeighborConnector(net.getID(), world, pos);
+            net = mergeNetworks(net, neighbor.getEnergyNetwork());
+            neighbor = getDifferentNeighborConnector(net.getID(), world, pos);
         }
-        net.AddConnector(connector, world, pos);
+        net.addConnector(connector, world, pos);
     }
-    static EnergyNetwork MergeNetworks(EnergyNetwork net1, EnergyNetwork net2)
+    static EnergyNetwork mergeNetworks(EnergyNetwork net1, EnergyNetwork net2)
     {
         if(net1.getID() == net2.getID())
             return net1;
@@ -188,11 +186,11 @@ public class EnergyNetwork {
         net1._drainConsumptions = _drainConsumption;
         net1._drainCount = _drains.length;
         //Cleanup
-        DestroyNetwork(net2);
+        destroyNetwork(net2);
         CTek.LOGGER.info("Merged Energy-Networks " + net1.getID() + " & " + net2.getID());
         return net1;
     }
-    static IEnergyConnector GetDifferentNeighborConnector(int netID, World world, BlockPos pos)
+    static IEnergyConnector getDifferentNeighborConnector(int netID, World world, BlockPos pos)
     {
         if(world.getBlockEntity(pos.north()) instanceof PSCBEntity pscbe && PSManager.getComponent(pscbe.ComponentID) instanceof IEnergyConnector iec && iec.getEnergyNetwork().getID() != netID)
             return iec;
@@ -208,7 +206,7 @@ public class EnergyNetwork {
             return iec;
         return null;
     }
-    static int[] ComputeNeighborConnectors(World world, BlockPos pos)
+    static int[] computeNeighborConnectors(World world, BlockPos pos)
     {
         int[] neighbors = new int[6];
         int count = 0;
@@ -230,15 +228,15 @@ public class EnergyNetwork {
     }
     public static EnergyNetwork getNetwork(int ID)
     { return _networks.get(ID); }
-    public static void LoadData(JsonObject data)
+    public static void loadData(JsonObject data)
     {
         JsonArray networks = data.get("_networks").getAsJsonArray();
         _networks.clear();
         for (int i = 0; i < networks.size(); i++)
-            LoadNetworkFromData(networks.get(i).getAsJsonObject());
-        CTek.LOGGER.info("Loaded " + _networks.size() + " Energy-Networks");
+            loadNetworkFromData(networks.get(i).getAsJsonObject());
+        CTek.LOGGER.info("Loaded {} Energy-Networks", _networks.size());
     }
-    static void LoadNetworkFromData(JsonObject data)
+    static void loadNetworkFromData(JsonObject data)
     {
         //Load Connectors
         JsonArray jconnectors = data.get("connectors").getAsJsonArray();
@@ -275,21 +273,20 @@ public class EnergyNetwork {
         }
         _networks.put(data.get("ID").getAsInt(), new EnergyNetwork(data.get("ID").getAsInt(), connectorComponents, connectorConnections, sourceComponents, sourcesProduction, drainComponents, drainConsumption));
     }
-    public static JsonObject SaveData()
+    public static JsonObject saveData()
     {
         JsonObject data = new JsonObject();
         JsonArray networks = new JsonArray();
         for (HashMap.Entry<Integer, EnergyNetwork> entry : _networks.entrySet())
-            networks.add(SaveNetworkData(entry.getValue()));
+            networks.add(saveNetworkData(entry.getValue()));
         data.add("_networks", networks);
-        CTek.LOGGER.info("Saved " + networks.size() + " Energy-Networks");
+        CTek.LOGGER.info("Saved {} Energy-Networks", networks.size());
         return data;
     }
-    static JsonObject SaveNetworkData(EnergyNetwork network)
+    static JsonObject saveNetworkData(EnergyNetwork network)
     {
         JsonObject data = new JsonObject();
         data.addProperty("ID", network.getID());
-        //Save Connectors
         JsonArray jconnectors = new JsonArray();
         for (int i = 0; i < network._connectorsCount; i++) {
             JsonObject item = new JsonObject();
@@ -301,7 +298,6 @@ public class EnergyNetwork {
             jconnectors.add(item);
         }
         data.add("connectors", jconnectors);
-        //Save Sources
         JsonArray jsources = new JsonArray();
         for (int i = 0; i < network._sourcesCount; i++) {
             JsonObject item = new JsonObject();
@@ -310,7 +306,6 @@ public class EnergyNetwork {
             jsources.add(item);
         }
         data.add("sources", jsources);
-        //Save Drains
         JsonArray jdrains = new JsonArray();
         for (int i = 0; i < network._drainCount; i++)
         {
@@ -322,7 +317,6 @@ public class EnergyNetwork {
         data.add("drains", jdrains);
         return data;
     }
-    //private Variables
     int _id;
     boolean _hasPower;
     //Sources
@@ -397,7 +391,7 @@ public class EnergyNetwork {
         for (int i = 0; i < _drainCount; i++)
             _drainComponents[i].onEnergyNetworkPowerStatusChanged(hasPower);
     }
-    void AddConnector(IEnergyConnector connector, World world, BlockPos pos)
+    void addConnector(IEnergyConnector connector, World world, BlockPos pos)
     {
         for (int i = 0; i < _connectorsCount; i++)
             if(_connectorComponents[i].getComponentID() == connector.getComponentID())
@@ -412,7 +406,7 @@ public class EnergyNetwork {
             _connectorConnections = newConnections;
         }
         _connectorComponents[_connectorsCount] = connector;
-        _connectorConnections[_connectorsCount] = ComputeNeighborConnectors(world, pos);
+        _connectorConnections[_connectorsCount] = computeNeighborConnectors(world, pos);
         for (int i = 0; i < _connectorsCount; i++)
             if(isIntInArray(_connectorComponents[i].getComponentID(), _connectorConnections[_connectorsCount]))
             {
@@ -424,11 +418,11 @@ public class EnergyNetwork {
         _connectorsCount++;
         connector.setEnergyNetwork(this);
         if(connector instanceof IEnergySource source)
-            AddSource(source);
+            addSource(source);
         if(connector instanceof IEnergyDrain drain)
-            AddDrain(drain);
+            addDrain(drain);
     }
-    void AddDrain(IEnergyDrain drain)
+    void addDrain(IEnergyDrain drain)
     {
         if(_drainCount == _drainComponents.length)
         {
@@ -443,7 +437,7 @@ public class EnergyNetwork {
         _drainConsumptions[_drainCount] = 0;
         _drainCount++;
     }
-    void RemoveDrain(IEnergyDrain drain)
+    void removeDrain(IEnergyDrain drain)
     {
         int drainIndex = getDrainIndex(drain.getComponentID());
         if(_drainConsumptions[drainIndex] != 0)
@@ -463,7 +457,7 @@ public class EnergyNetwork {
                 return i;
         return -1;
     }
-    void AddSource(IEnergySource source)
+    void addSource(IEnergySource source)
     {
         if(_sourcesCount == _energySourcesComponent.length)
         {
@@ -478,7 +472,7 @@ public class EnergyNetwork {
         _energySourcesProduction[_sourcesCount] = 0;
         _sourcesCount++;
     }
-    void RemoveSource(IEnergySource source)
+    void removeSource(IEnergySource source)
     {
         int sourceIndex = getSourceIndex(source.getComponentID());
         if(_energySourcesProduction[sourceIndex] != 0)
@@ -530,7 +524,7 @@ public class EnergyNetwork {
                 return i;
         return -1;
     }
-    void RemoveConnectorConnection(int connectorID, int connectedConnectorID)
+    void removeConnectorConnection(int connectorID, int connectedConnectorID)
     {
         int cI = getConnectorIndex(connectorID);
         boolean found = false;
@@ -545,12 +539,12 @@ public class EnergyNetwork {
                 ncc[offset++] = _connectorConnections[cI][i];
         _connectorConnections[cI] = ncc;
     }
-    void RemoveConnector(int connectorIndex)
+    void removeConnector(int connectorIndex)
     {
         if(_connectorComponents[connectorIndex] instanceof IEnergySource source)
-            RemoveSource(source);
+            removeSource(source);
         if(_connectorComponents[connectorIndex] instanceof IEnergyDrain drain)
-            RemoveDrain(drain);
+            removeDrain(drain);
         for (int i = connectorIndex; i < _connectorsCount-1; i++) {
             _connectorConnections[i] = _connectorConnections[i+1];
             _connectorComponents[i] = _connectorComponents[i+1];
@@ -559,7 +553,7 @@ public class EnergyNetwork {
         _connectorConnections[_connectorsCount] = null;
         _connectorComponents[_connectorsCount] = null;
     }
-    void Update()
+    void update()
     {
         boolean hasChanges = false;
         if(_updateTotalConsumption)
