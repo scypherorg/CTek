@@ -8,6 +8,7 @@ import org.scypher.ctek.CTek;
 import org.scypher.ctek.PS.base.PSManager;
 import org.scypher.ctek.blocks.base.PSCBEntity;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -576,9 +577,7 @@ public class EnergyNetwork {
     {
         CTek.LOGGER.info("Updating Energy Drain Consumption for Network {}", _id);
         _updateTotalConsumption = false;
-        int totalConsumption = 0;
-        for (int i = 0; i < _drainCount; i++)
-            totalConsumption += _drainConsumptions[i];
+        int totalConsumption = Arrays.stream(_drainConsumptions, 0, _drainCount).sum();
         if(totalConsumption == _totalConsumption)
             return false;
         _totalConsumption = totalConsumption;
@@ -588,9 +587,7 @@ public class EnergyNetwork {
     {
         CTek.LOGGER.info("Updating Energy Source Production for Network {}", _id);
         _updateTotalProduction = false;
-        int totalProduction = 0;
-        for (int i = 0; i < _sourcesCount; i++)
-            totalProduction += _energySourcesProduction[i];
+        int totalProduction = Arrays.stream(_energySourcesProduction, 0, _sourcesCount).sum();
         if(_totalProduction == totalProduction)
             return false;
         _totalProduction = totalProduction;
