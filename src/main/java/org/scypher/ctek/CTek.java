@@ -34,7 +34,7 @@ public class CTek implements ModInitializer {
 		try {
 			FileWriter writer = new FileWriter(_DATAPATH);
 			//Write to File
-			new GsonBuilder()/*.setPrettyPrinting()*/.create().toJson(data, writer);
+			new GsonBuilder().setPrettyPrinting().create().toJson(data, writer);
 			writer.close();
 		} catch (Exception e) {
 			CTek.LOGGER.warn("Unable to save ctek file at {} - {} :: {}", _DATAPATH, e.getStackTrace()[0], e.getMessage());

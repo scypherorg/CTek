@@ -105,6 +105,12 @@ public class EnergyNetwork {
                 nn.setProduction(source, net.getProduction(source));
                 net.RemoveSource(source);
             }
+            if(net._connectorComponents[i] instanceof IEnergyDrain drain)
+            {
+                nn.AddDrain(drain);
+                nn.setConsumption(drain, net.getConsumption(drain));
+                net.RemoveDrain(drain);
+            }
         }
         net._connectorComponents = cccomp;
         net._connectorConnections = cccon;
@@ -170,6 +176,16 @@ public class EnergyNetwork {
         net1._energySourcesComponent = _sources;
         net1._energySourcesProduction = _sourcesProduction;
         net1._sourcesCount = _sourcesProduction.length;
+        //Merge Drains
+        IEnergyDrain[] _drains = new IEnergyDrain[net1._drainCount + net2._drainCount];
+        int[] _drainConsumption = new int[net1._drainCount + net2._drainCount];
+        System.arraycopy(net1._drainComponents, 0, _drains, 0, net1._drainCount);
+        System.arraycopy(net2._drainComponents, 0, _drains, net1._drainCount, net2._drainCount);
+        System.arraycopy(net1._drainConsumptions, 0, _drainConsumption, 0, net1._drainCount);
+        System.arraycopy(net2._drainConsumptions, 0, _drainConsumption, net1._drainCount, net2._drainCount);
+        net1._drainComponents = _drains;
+        net1._drainConsumptions = _drainConsumption;
+        net1._drainCount = _drains.length;
         //Cleanup
         DestroyNetwork(net2);
         CTek.LOGGER.info("Merged Energy-Networks " + net1.getID() + " & " + net2.getID());
@@ -246,7 +262,17 @@ public class EnergyNetwork {
             sourceComponents[i] = (IEnergySource) PSManager.getComponent(item.get("CID").getAsInt());
             sourcesProduction[i] = item.get("p").getAsInt();
         }
-        _networks.put(data.get("ID").getAsInt(), new EnergyNetwork(data.get("ID").getAsInt(), connectorComponents, connectorConnections, sourceComponents, sourcesProduction));
+        //Load Drains
+        JsonArray jdrains = data.get("drains").getAsJsonArray();
+        IEnergyDrain[] drainComponents = new IEnergyDrain[jdrains.size()];
+        int[] drainConsumption = new int[jdrains.size()];
+        for (int i = 0; i < jdrains.size(); i++)
+        {
+            JsonObject item = jdrains.get(i).getAsJsonObject();
+            drainComponents[i] = (IEnergyDrain) PSManager.getComponent(item.get("CID").getAsInt());
+            drainConsumption[i] = item.get("c").getAsInt();
+        }
+        _networks.put(data.get("ID").getAsInt(), new EnergyNetwork(data.get("ID").getAsInt(), connectorComponents, connectorConnections, sourceComponents, sourcesProduction, drainComponents, drainConsumption));
     }
     public static JsonObject SaveData()
     {
@@ -283,10 +309,21 @@ public class EnergyNetwork {
             jsources.add(item);
         }
         data.add("sources", jsources);
+        //Save Drains
+        JsonArray jdrains = new JsonArray();
+        for (int i = 0; i < network._drainCount; i++)
+        {
+            JsonObject item = new JsonObject();
+            item.addProperty("CID", network._drainComponents[i].getComponentID());
+            item.addProperty("c", network._drainComponents[i].getComponentID());
+            jdrains.add(item);
+        }
+        data.add("drains", jdrains);
         return data;
     }
     //private Variables
     int _id;
+    boolean _hasPower;
     //Sources
     int _totalProduction = 0;
     boolean _updateTotalProduction = false;
@@ -305,6 +342,10 @@ public class EnergyNetwork {
     int _connectorsCount;
     int _maxRate = 69;
     //Public getters
+    public boolean hasPower()
+    {
+        return _hasPower;
+    }
     public int getID()
         {return _id;}
     public int getTotalProduction()
@@ -314,7 +355,7 @@ public class EnergyNetwork {
     public int getMaxTransferRate()
         {return _maxRate;}
     //Initializers
-    public EnergyNetwork(int id, IEnergyConnector[] connectors, int[][] connectorConnections, IEnergySource[] sources, int[] sourcesProduction)
+    public EnergyNetwork(int id, IEnergyConnector[] connectors, int[][] connectorConnections, IEnergySource[] sources, int[] sourcesProduction, IEnergyDrain[] drains, int[] drainConsumptions)
     {
         _id = id;
         _updateTotalProduction = true;
@@ -327,6 +368,9 @@ public class EnergyNetwork {
         _energySourcesComponent = sources;
         _energySourcesProduction = sourcesProduction;
         _sourcesCount = sources.length;
+        _drainComponents = drains;
+        _drainConsumptions = drainConsumptions;
+        _drainCount = drains.length;
     }
     public EnergyNetwork(int id)
     {
@@ -337,8 +381,19 @@ public class EnergyNetwork {
         _energySourcesComponent = new IEnergySource[PSManager.ArrayIncrementStep];
         _energySourcesProduction = new int[PSManager.ArrayIncrementStep];
         _sourcesCount = 0;
+        _drainComponents = new IEnergyDrain[PSManager.ArrayIncrementStep];
+        _drainConsumptions = new int[PSManager.ArrayIncrementStep];
+        _drainCount = 0;
     }
     //Logic
+    void setPower(boolean hasPower)
+    {
+        if(_hasPower == hasPower)
+            return;
+        _hasPower = hasPower;
+        for (int i = 0; i < _drainCount; i++)
+            _drainComponents[i].onEnergyNetworkPowerStatusChanged(hasPower);
+    }
     void AddConnector(IEnergyConnector connector, World world, BlockPos pos)
     {
         for (int i = 0; i < _connectorsCount; i++)
@@ -367,6 +422,8 @@ public class EnergyNetwork {
         connector.setEnergyNetwork(this);
         if(connector instanceof IEnergySource source)
             AddSource(source);
+        if(connector instanceof IEnergyDrain drain)
+            AddDrain(drain);
     }
     void AddDrain(IEnergyDrain drain)
     {
@@ -437,12 +494,24 @@ public class EnergyNetwork {
         int sI = getSourceIndex(source.getComponentID());
         if(_energySourcesProduction[sI] == production)
             return;
-        _totalProduction += production - _energySourcesProduction[sI];
         _energySourcesProduction[sI] = production;
+        _updateTotalProduction = true;
     }
     public int getProduction(IEnergySource source)
     {
         return _energySourcesProduction[getSourceIndex(source.getComponentID())];
+    }
+    public void setConsumption(IEnergyDrain drain, int consumption)
+    {
+        int dI = getDrainIndex(drain.getComponentID());
+        if(_drainConsumptions[dI] == consumption)
+            return;
+        _drainConsumptions[dI] = consumption;
+        _updateTotalConsumption = true;
+    }
+    public int getConsumption(IEnergyDrain drain)
+    {
+        return _drainConsumptions[getDrainIndex(drain.getComponentID())];
     }
     int getSourceIndex(int sourceID)
     {
@@ -477,6 +546,8 @@ public class EnergyNetwork {
     {
         if(_connectorComponents[connectorIndex] instanceof IEnergySource source)
             RemoveSource(source);
+        if(_connectorComponents[connectorIndex] instanceof IEnergyDrain drain)
+            RemoveDrain(drain);
         for (int i = connectorIndex; i < _connectorsCount-1; i++) {
             _connectorConnections[i] = _connectorConnections[i+1];
             _connectorComponents[i] = _connectorComponents[i+1];
@@ -492,12 +563,24 @@ public class EnergyNetwork {
             hasChanges |= updateConsumption();
         if(_updateTotalProduction)
             hasChanges |= updateProduction();
-        if (!hasChanges) {
-        }
+        if (!hasChanges)
+            return;
+        if(_totalConsumption > _totalProduction && _hasPower)
+            setPower(false);
+        if(_totalConsumption <= _totalProduction && !_hasPower)
+            setPower(true);
     }
     boolean updateConsumption()
     {
-        return false;
+        CTek.LOGGER.info("Updating Energy Drain Consumption for Network {}", _id);
+        _updateTotalConsumption = false;
+        int totalConsumption = 0;
+        for (int i = 0; i < _drainConsumptions.length; i++)
+            totalConsumption += _drainConsumptions[i];
+        if(totalConsumption == _totalConsumption)
+            return false;
+        _totalConsumption = totalConsumption;
+        return true;
     }
     boolean updateProduction()
     {

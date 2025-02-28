@@ -5,6 +5,7 @@ import net.minecraft.item.ItemUsageContext;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import org.scypher.ctek.PS.Energy.IEnergyConnector;
+import org.scypher.ctek.PS.Energy.IEnergyDrain;
 import org.scypher.ctek.PS.Energy.IEnergySource;
 import org.scypher.ctek.PS.base.PSManager;
 import org.scypher.ctek.blocks.base.PSCBEntity;
@@ -32,9 +33,13 @@ public class CTI_DebugTool extends Item {
             context.getPlayer().sendMessage(Text.of(" -Network-ID: " + iec.getEnergyNetwork().getID()));
             context.getPlayer().sendMessage(Text.of(" -Load: " + iec.getEnergyNetwork().getTotalConsumption() + "/" + iec.getEnergyNetwork().getTotalProduction()+"EU/t"));
             context.getPlayer().sendMessage(Text.of(" -Max Load: " + iec.getEnergyNetwork().getMaxTransferRate() + "EU/t"));
+            if(!iec.getEnergyNetwork().hasPower())
+            context.getPlayer().sendMessage(Text.of(" ! OVERLOADED !"));
         }
         if(PSManager.getComponent(pscbe.ComponentID) instanceof IEnergySource ies)
             context.getPlayer().sendMessage(Text.of(" -Production: " + ies.getEnergyNetwork().getProduction(ies) + "EU/t"));
+        if(PSManager.getComponent(pscbe.ComponentID) instanceof IEnergyDrain ied)
+            context.getPlayer().sendMessage(Text.of(" -Consumption: " + ied.getEnergyNetwork().getConsumption(ied) + "EU/t"));
         return ActionResult.PASS;
     }
 }

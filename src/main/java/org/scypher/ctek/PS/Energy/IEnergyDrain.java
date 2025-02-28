@@ -6,6 +6,5 @@ public interface IEnergyDrain {
     EnergyNetwork getEnergyNetwork();
 
     void setEnergyNetwork(EnergyNetwork network);
-
-    void setPowerStatus(boolean hasPower);
+    void onEnergyNetworkPowerStatusChanged(boolean hasPower);
 }
