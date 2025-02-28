@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "": { "model": "ctek:block/insulated_copper_cable" }
+  }
+}
