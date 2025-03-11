@@ -1,5 +1,23 @@
 {
-  "variants": {
-    "": { "model": "ctek:block/insulated_copper_cable" }
-  }
+  "multipart": [
+    {   "apply": { "model": "ctek:block/insulated_copper_cable/dot", "uvlock": true }},
+    {   "when": { "iecup": "true" },
+      "apply": { "model": "ctek:block/insulated_copper_cable/side", "uvlock": true }
+    },
+    {   "when": { "iecdown": "true" },
+      "apply": { "model": "ctek:block/insulated_copper_cable/side", "uvlock": true, "x": 180 }
+    },
+    {   "when": { "iecnorth": "true" },
+      "apply": { "model": "ctek:block/insulated_copper_cable/side", "uvlock": true, "x": 90 }
+    },
+    {   "when": { "iecsouth": "true" },
+      "apply": { "model": "ctek:block/insulated_copper_cable/side", "uvlock": true, "x": 270 }
+    },
+    {   "when": { "iecwest": "true" },
+      "apply": { "model": "ctek:block/insulated_copper_cable/side", "uvlock": true, "x": 90, "y": 270 }
+    },
+    {   "when": { "ieceast": "true" },
+      "apply": { "model": "ctek:block/insulated_copper_cable/side", "uvlock": true, "x": 90, "y": 90 }
+    }
+  ]
 }
