@@ -1,6 +1,7 @@
 {
   "textures": {
-    "cable": "ctek:block/insulated_copper_cable/base"
+    "cable": "ctek:block/insulated_copper_cable/base",
+    "particle": "ctek:block/insulated_copper_cable/base"
   },
   "elements": [
     {

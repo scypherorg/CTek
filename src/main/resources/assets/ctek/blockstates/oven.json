@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "": { "model": "ctek:block/oven/off" }
+  }
+}

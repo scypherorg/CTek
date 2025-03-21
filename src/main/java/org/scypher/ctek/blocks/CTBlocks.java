@@ -24,8 +24,8 @@ public class CTBlocks {
     public static final ItemGroup ITEMGROUP = InitItemGroup();
     public static BlockEntityType<PSCBEntity> PSCBE_ASSIGNER;
     //Blocks
-    public static final Block INSULATED_COPPER_CABLE = Register(new PSCB_InsulatedCopperCable(AbstractBlock.Settings.create().nonOpaque()), "insulated_copper_cable", true);
-    public static final Block CREATIVE_ENERGY_SOURCE = Register(new PSCB_CreativeEnergySource(AbstractBlock.Settings.create()), "creative_energy_source", true);
+    public static final Block INSULATED_COPPER_CABLE = Register(new PSCB_InsulatedCopperCable(AbstractBlock.Settings.create().nonOpaque().strength(.1f)), "insulated_copper_cable", true);
+    public static final Block CREATIVE_ENERGY_SOURCE = Register(new PSCB_CreativeEnergySource(AbstractBlock.Settings.create().strength(-1, 9999999)), "creative_energy_source", true);
     public static final Block OVEN = Register(new PSCB_Oven(AbstractBlock.Settings.create()), "oven", true);
 
     public static final Block ENERGY_SINK = Register(new PSCB_EnergySink(AbstractBlock.Settings.create()), "energy_sink", true);
