@@ -1,0 +1,37 @@
+{
+  "textures": {
+    "cable": "ctek:block/insulated_copper_cable/base"
+  },
+  "elements": [
+    {
+      "from": [4, 4, 4],
+      "to": [12, 12, 12],
+      "faces": {
+        "down": {
+          "uv": [0, 0, 8, 8],
+          "texture": "#cable"
+        },
+        "up": {
+          "uv": [0, 0, 8, 8],
+          "texture": "#cable"
+        },
+        "west": {
+          "uv": [0, 8, 8, 16],
+          "texture": "#cable"
+        },
+        "east": {
+          "uv": [0, 8, 8, 16],
+          "texture": "#cable"
+        },
+        "north": {
+          "uv": [0, 0, 8, 8],
+          "texture": "#cable"
+        },
+        "south": {
+          "uv": [0, 0, 8, 8],
+          "texture": "#cable"
+        }
+      }
+    }
+  ]
+}

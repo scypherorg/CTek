@@ -1,0 +1,84 @@
+{
+  "textures": {
+    "base": "ctek:block/insulated_copper_cable/base",
+    "angle": "ctek:block/insulated_copper_cable/angle_t"
+  },
+  "elements": [
+    {
+      "from": [4, 4, 0],
+      "to": [12, 12, 12],
+      "faces": {
+        "down": {
+          "uv": [12, 0, 0, 8],
+          "texture": "#angle",
+          "rotation": 90
+        },
+        "up": {
+          "uv": [0, 0, 12, 8],
+          "texture": "#angle",
+          "rotation": 90
+        },
+        "south": {
+          "uv": [12, 0, 4, 8],
+          "texture": "#angle"
+        },
+        "east": {
+          "uv": [0, 0, 12, 8],
+          "texture": "#base"
+        },
+        "west": {
+          "uv": [0, 0, 12, 8],
+          "texture": "#angle"
+        }
+      }
+    },
+    {
+      "from": [12, 4, 4],
+      "to": [16, 12, 12],
+      "faces": {
+        "north": {
+          "uv": [0, 0, 4, 8],
+          "texture": "#base"
+        },
+        "up": {
+          "uv": [0, 0, 4, 8],
+          "texture": "#base"
+        },
+        "down": {
+          "uv": [0, 0, 4, 8],
+          "texture": "#base"
+        },
+        "south": {
+          "uv": [0, 0, 4, 8],
+          "texture": "#base"
+        }
+      }
+    },
+    {
+      "from": [4, 12, 4],
+      "to": [12, 16, 12],
+      "faces": {
+        "north": {
+          "uv": [0, 0, 4, 8],
+          "texture": "#base",
+          "rotation": 90
+        },
+        "west": {
+          "uv": [0, 0, 4, 8],
+          "texture": "#base",
+          "rotation": 90
+        },
+        "east": {
+          "uv": [0, 0, 4, 8],
+          "texture": "#base",
+          "rotation": 90
+        },
+        "south": {
+          "uv": [0, 0, 4, 8],
+          "texture": "#base",
+          "rotation": 90
+        }
+      }
+    }
+  ]
+}
