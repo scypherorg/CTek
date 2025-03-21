@@ -335,7 +335,7 @@ public class EnergyNetwork {
     IEnergyConnector[] _connectorComponents;
     int[][] _connectorConnections;
     int _connectorsCount;
-    int _maxRate = 69;
+    int _maxRate = 256;
     //Public getters
     public boolean hasPower()
     {

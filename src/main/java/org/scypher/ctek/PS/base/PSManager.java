@@ -8,11 +8,15 @@ import net.minecraft.world.World;
 import org.scypher.ctek.CTek;
 import org.scypher.ctek.PS.Energy.EnergyNetwork;
 import org.scypher.ctek.PS.Energy.IEnergyConnector;
-
 public class PSManager {
     //Variables
     public static int ArrayIncrementStep = 8;
     static PSComponent[] _components = new PSComponent[ArrayIncrementStep];
+    public static long getTime()
+    {
+        return _time;
+    }
+    static long _time = 0;
     //Private
     static void ExtendComponentsArray()
     {
@@ -38,6 +42,7 @@ public class PSManager {
     }
     public static void LoadData(JsonObject data)
     {
+        _time = data.get("time").getAsLong();
         JsonArray comps = data.getAsJsonArray("_components");
         _components = new PSComponent[comps.size()];
         for (int i = 0; i < comps.size(); i++) {
@@ -49,6 +54,7 @@ public class PSManager {
     public static JsonObject SaveData()
     {
         JsonObject data = new JsonObject();
+        data.addProperty("time", _time);
         JsonArray comps = new JsonArray();
         for (PSComponent component : _components)
             if (component == null)
@@ -81,7 +87,34 @@ public class PSManager {
     }
     public static void OnTick(MinecraftServer server)
     {
+        _time++;
         EnergyNetwork.tick();
+        _ScheduledTickOffset = ++_ScheduledTickOffset % _ScheduledTicks.length;
+        for (int i = 0; i < _ScheduledTickCount[_ScheduledTickOffset]; i++) {
+            if(_components[_ScheduledTicks[_ScheduledTickOffset][i]] instanceof IScheduler is)
+                is.OnScheduledTick();
+        }
+        _ScheduledTickCount[_ScheduledTickOffset] = 0;
+    }
+    static int[][] _ScheduledTicks = new int[100][];
+    static int[] _ScheduledTickCount = new int[100];
+    static int _ScheduledTickOffset = 0;
+    public static void Schedule(int delay, int cID)
+    {
+        if(!(getComponent(cID) instanceof IScheduler))
+            throw new IllegalArgumentException("Component " + cID + " is not an instance of IScheduler");
+        if(delay >= _ScheduledTicks.length)
+            throw new IllegalArgumentException("Delay of " + delay + " ticks exceeds the max delay of " + (_ScheduledTicks.length-1) + " ticks");
+        int targetOffset = _ScheduledTickOffset + delay;
+        targetOffset %= _ScheduledTicks.length;
+        if(_ScheduledTicks[targetOffset].length < _ScheduledTickCount[targetOffset])
+        {
+            int[] nst = new int[_ScheduledTicks[targetOffset].length + ArrayIncrementStep];
+            System.arraycopy(_ScheduledTicks[targetOffset], 0, nst, 0, _ScheduledTicks[targetOffset].length);
+            _ScheduledTicks[targetOffset] = nst;
+        }
+        _ScheduledTicks[targetOffset][_ScheduledTickCount[targetOffset]] = cID;
+        _ScheduledTickCount[targetOffset]++;
     }
     public PSManager(){}
 }

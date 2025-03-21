@@ -68,7 +68,7 @@ public class CTek implements ModInitializer {
 				CTek.LOGGER.warn("Unable to load ctek file at {} - {} :: {}", _DATAPATH, e.getStackTrace()[0], e.getMessage());
             }
         });
-		ServerTickEvents.END_SERVER_TICK.register(PSManager::OnTick);
+		ServerTickEvents.START_SERVER_TICK.register(PSManager::OnTick);
 		LOGGER.info("Done initializing CTek.");
 	}
 
