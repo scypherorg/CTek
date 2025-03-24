@@ -1,5 +1,8 @@
 {
   "variants": {
-    "": { "model": "ctek:block/oven/off" }
+    "facing=south": { "model": "ctek:block/oven/off" },
+    "facing=west": { "model": "ctek:block/oven/off", "y": 90 },
+    "facing=north": { "model": "ctek:block/oven/off", "y": 180 },
+    "facing=east": { "model": "ctek:block/oven/off", "y": 270 }
   }
 }

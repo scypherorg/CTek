@@ -73,7 +73,6 @@ public class PSManager {
             EnergyNetwork.createConnector(iec, world, pos);
         if(component instanceof IOnPlaced ion)
             ion.OnPlaced(world, pos);
-        CTek.SaveData();
         return component.ComponentID;
     }
     public static void DestroyComponent(int cID)
@@ -82,7 +81,6 @@ public class PSManager {
         _components[cID] = null;
         if(component instanceof IEnergyConnector iec)
             EnergyNetwork.destroyConnector(iec);
-        CTek.SaveData();
         CTek.LOGGER.info("PSC {} destroyed", cID);
     }
     public static void OnTick(MinecraftServer server)

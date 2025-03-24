@@ -13,7 +13,7 @@ public class PSC_Oven extends PSComponent implements IEnergyConnector, IEnergyDr
     }
     @Override
     public PSComponent CreateInstance() {
-        return new PSC_Cable();
+        return new PSC_Oven();
     }
     @Override
     public void setEnergyNetwork(EnergyNetwork network) {
