@@ -27,7 +27,7 @@ public class PSManager {
     //Public
     public static PSComponent getComponent(int id)
     {
-        if(id >= _components.length)
+        if(id >= _components.length || id < 0)
             return null;
         return _components[id];
     }
@@ -68,6 +68,7 @@ public class PSManager {
     {
         if(component.ComponentID == -1)
             component.ComponentID = getFreeComponentID();
+
         _components[component.ComponentID] = component;
         if(component instanceof IEnergyConnector iec)
             EnergyNetwork.createConnector(iec, world, pos);
